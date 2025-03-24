@@ -1,15 +1,21 @@
 'use client';
  
- import {useRouter} from "next/navigation";
- import Main from "@/app/(beforeLogin)/_component/Main";
+import {useRouter} from "next/navigation";
+import Main from "@/app/(beforeLogin)/_component/Main";
 import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export default function Login(){
     const router = useRouter();
- 
-    useEffect(() => {
-        router.replace('/i/flow/login');
-    }, []);
+    const {data: session} = useSession();
 
+    useEffect(() => {
+        if(session?.user) {
+            router?.replace('/home');
+        } else {
+            router?.replace('/i/flow/login');
+        }
+    }, [router, session]); // session도 의존성에 추가
+    
     return <Main />;
 }
