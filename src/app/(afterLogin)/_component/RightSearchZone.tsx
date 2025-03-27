@@ -3,7 +3,7 @@
 import style from './rightSearchZone.module.css';
 import { usePathname, useSearchParams } from 'next/navigation';
 import SearchForm from './SearchForm';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export default function RightSearchZone(){
 

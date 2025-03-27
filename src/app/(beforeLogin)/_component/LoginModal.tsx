@@ -16,11 +16,20 @@ export default function LoginModal() {
     setMessage('');
 
     try {
-      await signIn("credentials",{ //아이디, 비밀번호 로그인
+      const result = await signIn("credentials",{ //아이디, 비밀번호 로그인
         username: id,
         password,
         redirect: false
       });
+      console.log(result);
+      if(result?.code) {
+        if(result.code === 'invalid_password') {
+          setMessage('비밀번호가 일치하지 않습니다.');
+        } else if(result.code === 'no_user') {
+          setMessage('회원 정보가 없습니다');
+        }
+        return;
+      }
       router.replace('/home');  
     } catch (err) {
       console.error(err);

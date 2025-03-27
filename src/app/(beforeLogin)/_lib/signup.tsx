@@ -1,6 +1,7 @@
 "use server";
 
 import { signIn } from "@/auth";
+import { redirect } from "next/navigation";
 
 type Errors = {
   id: string;
@@ -26,7 +27,7 @@ export default async function SignUp(_: any,formData: FormData) {
       hasError = true;
     }
     if(!formData.get('name') || !(formData.get('name') as string)?.trim()){
-      errors.name = '이름을 입력해주세요.';
+      errors.name = '닉네임을 입력해주세요.';
       hasError = true;
     }
     if(!formData.get('password') || !(formData.get('password') as string)?.trim()){
@@ -45,34 +46,42 @@ export default async function SignUp(_: any,formData: FormData) {
       };
     }
 
+    formData.set('nickname', formData.get('name') as string);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`,{
         method: 'POST',
         body: formData,
         credentials: 'include',
-        headers: {
-          "Content-Type": "application/json",
-        },
       })
-  
-      console.log(response.status);
+      
       if(response.status === 403){
-        //throw new Error('이미 존재하는 아이디입니다.');
         return {
           status : false,
           errors: null,
           message : "이미 존재하는 아이디입니다."
         };
+      } else if(response.status === 400){
+        const errorData = await response.json();
+        return {
+          status : false,
+          errors: null,
+          message : errorData.data[0]
+        };
       }
-      console.log(await response.json());
+      
+      // 응답 본문을 한 번만 파싱하고 결과를 저장
+      const userData = await response.json();
+      console.log(userData);
 
-      shouldRedirect=true;
+      shouldRedirect = true;
 
-      await signIn("credentials",{ //아이디, 비밀번호 로그인
+      const signInResult = await signIn("credentials", { // 아이디, 비밀번호 로그인
         username: formData.get('id'),
         password: formData.get('password'),
         redirect: false
       });
+      
+      console.log('Sign in result:', signInResult);
     } catch (error) {
       return {
         status : false,
@@ -83,6 +92,11 @@ export default async function SignUp(_: any,formData: FormData) {
     
     
     if(shouldRedirect){
-     //redirect('/home');
+     redirect('/home');
     }
+
+    return {
+      status: true,
+      errors: null
+    };
 };

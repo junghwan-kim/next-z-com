@@ -1,3 +1,4 @@
+import { Metadata, ResolvingMetadata } from "next";
 import BackButton from "../_component/BackButton";
 import Post from "../_component/Post";
 import SearchForm from "../_component/SearchForm";
@@ -9,6 +10,15 @@ import style from './search.module.css';
 type Props ={
     searchParams: Promise<{q: string, f?: string, pf?: string}>;
 };
+
+export async function generateMetadata({searchParams}: Props, parent: ResolvingMetadata):Promise<Metadata>{
+    const query = await searchParams;
+    return {
+        title: `${query.q} - 검색 / Z`,
+        description: `${query.q} - 검색 / Z`
+    };
+
+}
 
 export default async function Search({searchParams}: Props) {
     const query = await searchParams;

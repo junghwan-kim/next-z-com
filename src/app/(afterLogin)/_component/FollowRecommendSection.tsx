@@ -1,4 +1,4 @@
-"user client";
+"use client";
 
 import { User } from "@/model/User";
 import { useQuery } from "@tanstack/react-query";

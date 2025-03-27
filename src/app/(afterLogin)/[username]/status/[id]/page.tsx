@@ -6,13 +6,31 @@ import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query
 import { getSinglePost } from "./_lib/getSinglePost";
 import { getComments } from "./_lib/getComments";
 import Comments from "./_component/Comments";
+import { Metadata } from "next";
+import { Post } from "@/model/Post";
+import { User } from "next-auth";
+import { getUserServer } from "../../_lib/getUserServer";
+import { getSinglePostServer } from "./_lib/getSinglePostServer";
 
 type Props = {
-    props: Promise<{ id: string, username: string }>;
+  params: Promise<{ id: string, username: string }>;
+}
+
+  export async function generateMetadata({params}: Props): Promise<Metadata> {
+    const {username, id} = await params;
+    const [user, post]: [User, Post] = await Promise.all([
+      getUserServer({queryKey: ["users", username]}),
+      getSinglePostServer({queryKey: ["posts", id]}),
+    ]);
+    return {
+      title: `Z에서 ${user.name} 님 : ${post.content}`,
+      description: post.content,
+    }
   }
 
-export default async function Page({props}: Props){
-    const {id} = await props;
+
+export default async function Page({params}: Props){
+    const {id} = await params;
 
     const queryClient = new QueryClient();
     await queryClient.prefetchQuery({queryKey:['posts', id], queryFn: getSinglePost});

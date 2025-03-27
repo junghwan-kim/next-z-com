@@ -1,4 +1,4 @@
-"user client";
+"use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Post as IPost} from "@/model/Post";

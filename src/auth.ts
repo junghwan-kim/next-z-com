@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+import NextAuth, { CredentialsSignin } from "next-auth"
  import CredentialsProvider from "next-auth/providers/credentials";
  import {NextResponse} from "next/server";
  
@@ -33,9 +33,16 @@ import NextAuth from "next-auth"
              password: credentials.password,
            }),
          })
- 
+         //console.log(authResponse) 
          if (!authResponse.ok) {
-           return null
+           const credentialsSignIn = new CredentialsSignin();
+           if(authResponse.status === 404){
+             credentialsSignIn.code = 'no_user';
+           } else if(authResponse.status === 401){
+             credentialsSignIn.code = 'invalid_password';
+           }
+
+           throw credentialsSignIn;
          }
  
          const user = await authResponse.json()
